@@ -49,7 +49,8 @@
       import { Buffer } from "https://esm.sh/buffer@6.0.3/";
       window.Buffer = Buffer;
 
-      const connection = new solanaWeb3.Connection("https://api.devnet.solana.com", "confirmed");
+      const connection = provider.connection;
+
       const programId = new solanaWeb3.PublicKey("8RxZb6nik5PKgUbPvPFhHxFjMKVkaah2fVnobhh4ioj9");
 
       const provider = window.phantom?.solana;
