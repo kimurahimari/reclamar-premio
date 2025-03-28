@@ -61,7 +61,6 @@
         await provider.connect();
 
         const connection = new solanaWeb3.Connection("https://api.devnet.solana.com", "confirmed");
-
         const programId = new solanaWeb3.PublicKey("8RxZb6nik5PKgUbPvPFhHxFjMKVkaah2fVnobhh4ioj9");
 
         const instruction = new solanaWeb3.TransactionInstruction({
@@ -72,8 +71,10 @@
 
         const transaction = new solanaWeb3.Transaction().add(instruction);
         transaction.feePayer = provider.publicKey;
-        transaction.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
 
+        // ✅ Corrección aquí: usar getLatestBlockhash de forma segura
+        const { blockhash } = await connection.getLatestBlockhash();
+        transaction.recentBlockhash = blockhash;
 
         const signed = await provider.signTransaction(transaction);
         const signature = await connection.sendRawTransaction(signed.serialize());
