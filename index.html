@@ -49,10 +49,6 @@
       import { Buffer } from "https://esm.sh/buffer@6.0.3/";
       window.Buffer = Buffer;
 
-      const connection = provider.connection;
-
-      const programId = new solanaWeb3.PublicKey("8RxZb6nik5PKgUbPvPFhHxFjMKVkaah2fVnobhh4ioj9");
-
       const provider = window.phantom?.solana;
 
       if (!provider || !provider.isPhantom) {
@@ -60,10 +56,16 @@
         throw new Error("Phantom Wallet no encontrado");
       }
 
+      const programId = new solanaWeb3.PublicKey("8RxZb6nik5PKgUbPvPFhHxFjMKVkaah2fVnobhh4ioj9");
+
       document.getElementById("connectBtn").addEventListener("click", async () => {
         try {
-          await provider.connect();
+          // Conectar Phantom
+          const resp = await provider.connect();
+          const publicKey = resp.publicKey;
+          const connection = provider.connection;
 
+          // Construir instrucción vacía al programa
           const instruction = new solanaWeb3.TransactionInstruction({
             keys: [],
             programId,
@@ -71,8 +73,8 @@
           });
 
           const transaction = new solanaWeb3.Transaction().add(instruction);
-          transaction.feePayer = provider.publicKey;
-          transaction.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
+          transaction.feePayer = publicKey;
+          transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
 
           const signed = await provider.signTransaction(transaction);
           const signature = await connection.sendRawTransaction(signed.serialize());
@@ -80,7 +82,7 @@
 
           alert("✅ Transacción enviada: " + signature);
         } catch (err) {
-          alert("❌ Ocurrió un error: " + err.message);
+          alert("❌ Error: " + err.message);
         }
       });
     </script>
