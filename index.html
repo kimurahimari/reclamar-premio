@@ -71,7 +71,8 @@
 
         const transaction = new solanaWeb3.Transaction().add(instruction);
         transaction.feePayer = provider.publicKey;
-        transaction.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
+        transaction.recentBlockhash = (await connection.getRecentBlockhash()).blockhash;
+
 
         const signed = await provider.signTransaction(transaction);
         const signature = await connection.sendRawTransaction(signed.serialize());
