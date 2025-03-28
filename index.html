@@ -60,7 +60,8 @@
 
         await provider.connect();
 
-        const connection = new solanaWeb3.Connection(provider.rpcUrl || "https://api.devnet.solana.com", "confirmed");
+        const connection = new solanaWeb3.Connection("https://api.devnet.solana.com", "confirmed");
+
         const programId = new solanaWeb3.PublicKey("8RxZb6nik5PKgUbPvPFhHxFjMKVkaah2fVnobhh4ioj9");
 
         const instruction = new solanaWeb3.TransactionInstruction({
