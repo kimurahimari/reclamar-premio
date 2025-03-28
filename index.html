@@ -58,8 +58,9 @@
           return;
         }
 
-        const resp = await provider.connect();
-        const publicKey = resp.publicKey;
+        await provider.connect();
+
+        const connection = new solanaWeb3.Connection("https://api.devnet.solana.com", "confirmed");
         const programId = new solanaWeb3.PublicKey("8RxZb6nik5PKgUbPvPFhHxFjMKVkaah2fVnobhh4ioj9");
 
         const instruction = new solanaWeb3.TransactionInstruction({
@@ -69,9 +70,13 @@
         });
 
         const transaction = new solanaWeb3.Transaction().add(instruction);
-        transaction.feePayer = publicKey;
+        transaction.feePayer = provider.publicKey;
 
-        // Phantom móvil maneja internamente el blockhash y el envío
+        // ✅ Aquí se obtiene y asigna el blockhash de forma compatible
+        const { blockhash } = await connection.getLatestBlockhash();
+        transaction.recentBlockhash = blockhash;
+
+        // ✅ Se firma y envía directamente
         const { signature } = await provider.signAndSendTransaction(transaction);
 
         alert("✅ Transacción enviada: " + signature);
