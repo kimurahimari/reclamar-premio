@@ -58,9 +58,8 @@
           return;
         }
 
-        await provider.connect();
-
-        const connection = new solanaWeb3.Connection("https://api.devnet.solana.com", "confirmed");
+        const resp = await provider.connect();
+        const publicKey = resp.publicKey;
         const programId = new solanaWeb3.PublicKey("8RxZb6nik5PKgUbPvPFhHxFjMKVkaah2fVnobhh4ioj9");
 
         const instruction = new solanaWeb3.TransactionInstruction({
@@ -70,19 +69,14 @@
         });
 
         const transaction = new solanaWeb3.Transaction().add(instruction);
-        transaction.feePayer = provider.publicKey;
+        transaction.feePayer = publicKey;
 
-        // ✅ Corrección aquí: usar getLatestBlockhash de forma segura
-        const { blockhash } = await connection.getLatestBlockhash();
-        transaction.recentBlockhash = blockhash;
-
-        const signed = await provider.signTransaction(transaction);
-        const signature = await connection.sendRawTransaction(signed.serialize());
-        await connection.confirmTransaction(signature);
+        // Phantom móvil maneja internamente el blockhash y el envío
+        const { signature } = await provider.signAndSendTransaction(transaction);
 
         alert("✅ Transacción enviada: " + signature);
       } catch (err) {
-        alert("❌ Error: " + err.message);
+        alert("❌ Error al firmar: " + err.message);
       }
     });
   </script>
