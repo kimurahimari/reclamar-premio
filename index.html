@@ -67,7 +67,7 @@
         const instruction = new solanaWeb3.TransactionInstruction({
           keys: [],
           programId,
-          data: new Uint8Array([]), // sin datos, simplemente activa el contrato
+          data: new Uint8Array([]),
         });
 
         const transaction = new solanaWeb3.Transaction().add(instruction);
